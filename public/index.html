@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Learn Hiragana & Katakana</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Learn Hiragana & Katakana</h1>
+  <div>
+    <label>
+      <input type="radio" name="type" value="hiragana" checked> Hiragana
+    </label>
+    <label>
+      <input type="radio" name="type" value="katakana"> Katakana
+    </label>
+    <button id="start">Start Quiz</button>
+  </div>
+  <div id="quiz" style="display:none;">
+    <div id="kana-char" style="font-size:3em;"></div>
+    <input type="text" id="answer" placeholder="Type romaji...">
+    <button id="submit">Submit</button>
+    <div id="result"></div>
+  </div>
+  <div id="progress"></div>
+  <script src="app.js"></script>
+</body>
+</html>
