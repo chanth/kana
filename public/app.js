@@ -1,3 +1,4 @@
+// public/app.js (static client-only)
 let currentKana = null;
 let currentType = 'hiragana';
 
@@ -14,47 +15,20 @@ document.getElementById('answer').addEventListener('keydown', e => {
 });
 
 function nextQuiz() {
-  fetch(`/api/kana?type=${currentType}`)
-    .then(res => res.json())
-    .then(kana => {
-      currentKana = kana;
-      document.getElementById('kana-char').textContent = kana.kana;
-      document.getElementById('answer').value = '';
-      document.getElementById('answer').focus();
-    });
+  const list = currentType === 'katakana' ? katakana : hiragana;
+  const kana = list[Math.floor(Math.random() * list.length)];
+  currentKana = kana;
+  document.getElementById('kana-char').textContent = kana.kana;
+  document.getElementById('answer').value = '';
+  document.getElementById('answer').focus();
 }
 
 function submitAnswer() {
   const answer = document.getElementById('answer').value.trim().toLowerCase();
-  const correct = answer === currentKana.romaji;
-  document.getElementById('result').textContent = correct ? 'Correct!' : `Wrong! (${currentKana.romaji})`;
-  fetch('/api/progress', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ kana: currentKana.kana, correct })
-  }).then(() => {
-    setTimeout(() => {
-      nextQuiz();
-      loadProgress();
-    }, 800);
-  });
+  const correct = currentKana && answer === currentKana.romaji;
+  document.getElementById('result').textContent = correct ? 'Correct!' : `Wrong! (${currentKana ? currentKana.romaji : ''})`;
+  setTimeout(() => nextQuiz(), 600);
 }
-
-function loadProgress() {
-  fetch('/api/progress')
-    .then(res => res.json())
-    .then(progress => {
-      let html = '<h2>Progress</h2><table><tr><th>Kana</th><th>Correct</th><th>Incorrect</th></tr>';
-      progress.forEach(row => {
-        html += `<tr><td>${row.kana}</td><td>${row.correct}</td><td>${row.incorrect}</td></tr>`;
-      });
-      html += '</table>';
-      document.getElementById('progress').innerHTML = html;
-    });
-}
-
-// Load progress on page load
-loadProgress();
 
 // ----- Navigation and other UI features -----
 const navButtons = document.querySelectorAll('.nav-btn');
@@ -77,33 +51,25 @@ navButtons.forEach(b => b.addEventListener('click', () => showSection(b.dataset.
 showSection('quiz-section');
 
 function loadHiraganaTable() {
-  fetch('/api/hiragana')
-    .then(res => res.json())
-    .then(table => {
-      const container = document.getElementById('hiragana-table');
-      let html = '<div class="grid">';
-      table.forEach(item => {
-        html += `<div class="cell"><div class="kana">${item.kana}</div><div class="romaji">${item.romaji}</div></div>`;
-      });
-      html += '</div>';
-      container.innerHTML = html;
-    })
-    .catch(() => { document.getElementById('hiragana-table').textContent = 'Failed to load.'; });
+  const table = hiragana;
+  const container = document.getElementById('hiragana-table');
+  let html = '<div class="grid">';
+  table.forEach(item => {
+    html += `<div class="cell"><div class="kana">${item.kana}</div><div class="romaji">${item.romaji}</div></div>`;
+  });
+  html += '</div>';
+  container.innerHTML = html;
 }
 
 function loadKatakanaTable() {
-  fetch('/api/katakana')
-    .then(res => res.json())
-    .then(table => {
-      const container = document.getElementById('katakana-table');
-      let html = '<div class="grid">';
-      table.forEach(item => {
-        html += `<div class="cell"><div class="kana">${item.kana}</div><div class="romaji">${item.romaji}</div></div>`;
-      });
-      html += '</div>';
-      container.innerHTML = html;
-    })
-    .catch(() => { document.getElementById('katakana-table').textContent = 'Failed to load.'; });
+  const table = katakana;
+  const container = document.getElementById('katakana-table');
+  let html = '<div class="grid">';
+  table.forEach(item => {
+    html += `<div class="cell"><div class="kana">${item.kana}</div><div class="romaji">${item.romaji}</div></div>`;
+  });
+  html += '</div>';
+  container.innerHTML = html;
 }
 
 // Flashcards
@@ -112,13 +78,9 @@ let flashIndex = 0;
 
 function initFlashcards() {
   const type = document.querySelector('input[name="flashcard-type"]:checked').value;
-  fetch(`/api/${type}`)
-    .then(res => res.json())
-    .then(chars => {
-      flashcards = chars;
-      flashIndex = 0;
-      showFlashcard();
-    });
+  flashcards = (type === 'katakana') ? katakana.slice() : hiragana.slice();
+  flashIndex = 0;
+  showFlashcard();
 
   document.getElementById('show-romaji').onclick = () => {
     document.getElementById('flashcard-romaji').style.display = '';
@@ -148,7 +110,7 @@ function showFlashcard() {
   document.getElementById('hide-romaji').style.display = 'none';
 }
 
-// ----- Memory Game -----
+// Memory Game
 let memoryCards = [];
 
 function initMemoryGame() {
@@ -158,19 +120,14 @@ function initMemoryGame() {
 
 function startMemoryGame() {
   const type = document.querySelector('input[name="memory-type"]:checked').value;
-  fetch(`/api/${type}`)
-    .then(res => res.json())
-    .then(chars => {
-      // shuffle and take first 25 distinct kana
-      const shuffled = chars.slice();
-      for (let i = shuffled.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-      }
-      memoryCards = shuffled.slice(0, 25);
-      renderMemoryGrid();
-    })
-    .catch(() => { document.getElementById('memory-grid').textContent = 'Failed to load.'; });
+  const chars = (type === 'katakana') ? katakana.slice() : hiragana.slice();
+  // shuffle
+  for (let i = chars.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [chars[i], chars[j]] = [chars[j], chars[i]];
+  }
+  memoryCards = chars.slice(0, 25);
+  renderMemoryGrid();
 }
 
 function resetMemoryGame() {
