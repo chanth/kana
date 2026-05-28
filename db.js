@@ -106,7 +106,6 @@ const katakana = [
   { "kana": "ワ", "romaji": "wa" },
   { "kana": "ヲ", "romaji": "wo" },
   { "kana": "ン", "romaji": "n" }
-  // ... add more katakana
 ];
 
 // Create table if not exists

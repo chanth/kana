@@ -68,6 +68,7 @@ function showSection(id) {
   if (id === 'hiragana-table-section') loadHiraganaTable();
   if (id === 'katakana-table-section') loadKatakanaTable();
   if (id === 'flashcard-section') initFlashcards();
+  if (id === 'memory-section') initMemoryGame();
 }
 
 navButtons.forEach(b => b.addEventListener('click', () => showSection(b.dataset.section)));
@@ -145,4 +146,52 @@ function showFlashcard() {
   document.getElementById('flashcard-romaji').style.display = 'none';
   document.getElementById('show-romaji').style.display = '';
   document.getElementById('hide-romaji').style.display = 'none';
+}
+
+// ----- Memory Game -----
+let memoryCards = [];
+
+function initMemoryGame() {
+  document.getElementById('start-memory').onclick = startMemoryGame;
+  document.getElementById('reset-memory').onclick = resetMemoryGame;
+}
+
+function startMemoryGame() {
+  const type = document.querySelector('input[name="memory-type"]:checked').value;
+  fetch(`/api/${type}`)
+    .then(res => res.json())
+    .then(chars => {
+      // shuffle and take first 25 distinct kana
+      const shuffled = chars.slice();
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+      memoryCards = shuffled.slice(0, 25);
+      renderMemoryGrid();
+    })
+    .catch(() => { document.getElementById('memory-grid').textContent = 'Failed to load.'; });
+}
+
+function resetMemoryGame() {
+  memoryCards = [];
+  document.getElementById('memory-grid').innerHTML = '';
+}
+
+function renderMemoryGrid() {
+  const container = document.getElementById('memory-grid');
+  container.innerHTML = '';
+  const grid = document.createElement('div');
+  grid.className = 'memory-grid';
+  memoryCards.forEach((c, idx) => {
+    const card = document.createElement('div');
+    card.className = 'memory-card';
+    card.dataset.romaji = c.romaji;
+    card.innerHTML = `<div class="kana">${c.kana}</div><div class="romaji">${c.romaji}</div>`;
+    card.addEventListener('click', () => {
+      card.classList.toggle('revealed');
+    });
+    grid.appendChild(card);
+  });
+  container.appendChild(grid);
 }

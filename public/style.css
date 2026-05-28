@@ -38,3 +38,22 @@ h1 { color: #333; margin-bottom: 0.5em; }
 	nav { gap: 0.25em; }
 	.nav-btn { padding: 0.4em 0.6em; font-size: 0.95em; }
 }
+
+/* Memory game styles */
+.memory-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0.5rem; max-width: 680px; margin: 0 auto; }
+.memory-card { background: #fff; border: 1px solid #e6e6e6; border-radius: 8px; height: 90px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: transform .12s, box-shadow .12s; }
+.memory-card:hover { transform: translateY(-3px); box-shadow: 0 4px 12px rgba(0,0,0,.08); }
+.memory-card .kana { font-size: 2rem; }
+.memory-card .romaji { margin-top: 0.25rem; color: #444; font-size: 1rem; display: none; }
+.memory-card.revealed { background: #f0f8ff; border-color: #bcdffb; }
+.memory-card.revealed .romaji { display: block; }
+
+@media (max-width: 640px) {
+	.memory-grid { grid-template-columns: repeat(5, 1fr); gap: 0.4rem; }
+	.memory-card { height: 72px; }
+	.memory-card .kana { font-size: 1.5rem; }
+}
+
+@media (max-width: 420px) {
+	.memory-grid { grid-template-columns: repeat(4, 1fr); }
+}

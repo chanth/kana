@@ -13,6 +13,7 @@
     <button class="nav-btn" data-section="hiragana-table-section">Hiragana Table</button>
     <button class="nav-btn" data-section="katakana-table-section">Katakana Table</button>
     <button class="nav-btn" data-section="flashcard-section">Flash Cards</button>
+    <button class="nav-btn" data-section="memory-section">Memory Game</button>
   </nav>
 
   <section id="quiz-section">
@@ -32,6 +33,16 @@
       <div id="result"></div>
     </div>
     <div id="progress"></div>
+  </section>
+  <section id="memory-section" style="display:none;">
+    <h2>Memory Game</h2>
+    <div>
+      <label><input type="radio" name="memory-type" value="hiragana" checked> Hiragana</label>
+      <label><input type="radio" name="memory-type" value="katakana"> Katakana</label>
+      <button id="start-memory">Start Memory Game</button>
+      <button id="reset-memory">Reset</button>
+    </div>
+    <div id="memory-grid" style="margin-top:1em;"></div>
   </section>
 
   <section id="hiragana-table-section" style="display:none;">
