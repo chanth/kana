@@ -7,6 +7,16 @@ const PORT = 3030;
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// API: Get full hiragana table
+app.get('/api/hiragana', (req, res) => {
+  res.json(db.getHiragana());
+});
+
+// API: Get full katakana table
+app.get('/api/katakana', (req, res) => {
+  res.json(db.getKatakana());
+});
+
 // API: Get random kana (hiragana or katakana)
 app.get('/api/kana', (req, res) => {
   const { type } = req.query; // 'hiragana' or 'katakana'

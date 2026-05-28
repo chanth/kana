@@ -8,22 +8,56 @@
 </head>
 <body>
   <h1>Learn Hiragana & Katakana</h1>
-  <div>
-    <label>
-      <input type="radio" name="type" value="hiragana" checked> Hiragana
-    </label>
-    <label>
-      <input type="radio" name="type" value="katakana"> Katakana
-    </label>
-    <button id="start">Start Quiz</button>
-  </div>
-  <div id="quiz" style="display:none;">
-    <div id="kana-char" style="font-size:3em;"></div>
-    <input type="text" id="answer" placeholder="Type romaji...">
-    <button id="submit">Submit</button>
-    <div id="result"></div>
-  </div>
-  <div id="progress"></div>
+  <nav>
+    <button class="nav-btn" data-section="quiz-section">Quiz</button>
+    <button class="nav-btn" data-section="hiragana-table-section">Hiragana Table</button>
+    <button class="nav-btn" data-section="katakana-table-section">Katakana Table</button>
+    <button class="nav-btn" data-section="flashcard-section">Flash Cards</button>
+  </nav>
+
+  <section id="quiz-section">
+    <div>
+      <label>
+        <input type="radio" name="type" value="hiragana" checked> Hiragana
+      </label>
+      <label>
+        <input type="radio" name="type" value="katakana"> Katakana
+      </label>
+      <button id="start">Start Quiz</button>
+    </div>
+    <div id="quiz" style="display:none;">
+      <div id="kana-char" style="font-size:3em;"></div>
+      <input type="text" id="answer" placeholder="Type romaji...">
+      <button id="submit">Submit</button>
+      <div id="result"></div>
+    </div>
+    <div id="progress"></div>
+  </section>
+
+  <section id="hiragana-table-section" style="display:none;">
+    <h2>Hiragana Table</h2>
+    <div id="hiragana-table"></div>
+  </section>
+
+  <section id="katakana-table-section" style="display:none;">
+    <h2>Katakana Table</h2>
+    <div id="katakana-table"></div>
+  </section>
+
+  <section id="flashcard-section" style="display:none;">
+    <h2>Flash Cards</h2>
+    <div id="flashcard-container">
+      <div id="flashcard-kana" style="font-size:3em;"></div>
+      <div id="flashcard-romaji" style="font-size:2em; display:none;"></div>
+      <button id="show-romaji">Show Romaji</button>
+      <button id="hide-romaji" style="display:none;">Hide Romaji</button>
+      <button id="next-flashcard">Next</button>
+      <div style="margin-top:1em;">
+        <label><input type="radio" name="flashcard-type" value="hiragana" checked> Hiragana</label>
+        <label><input type="radio" name="flashcard-type" value="katakana"> Katakana</label>
+      </div>
+    </div>
+  </section>
   <script src="app.js"></script>
 </body>
 </html>

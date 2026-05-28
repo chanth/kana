@@ -55,3 +55,94 @@ function loadProgress() {
 
 // Load progress on page load
 loadProgress();
+
+// ----- Navigation and other UI features -----
+const navButtons = document.querySelectorAll('.nav-btn');
+
+function showSection(id) {
+  document.querySelectorAll('section').forEach(s => s.style.display = 'none');
+  const el = document.getElementById(id);
+  if (el) el.style.display = '';
+  navButtons.forEach(b => b.classList.toggle('active', b.dataset.section === id));
+
+  if (id === 'hiragana-table-section') loadHiraganaTable();
+  if (id === 'katakana-table-section') loadKatakanaTable();
+  if (id === 'flashcard-section') initFlashcards();
+}
+
+navButtons.forEach(b => b.addEventListener('click', () => showSection(b.dataset.section)));
+
+// Default view
+showSection('quiz-section');
+
+function loadHiraganaTable() {
+  fetch('/api/hiragana')
+    .then(res => res.json())
+    .then(table => {
+      const container = document.getElementById('hiragana-table');
+      let html = '<div class="grid">';
+      table.forEach(item => {
+        html += `<div class="cell"><div class="kana">${item.kana}</div><div class="romaji">${item.romaji}</div></div>`;
+      });
+      html += '</div>';
+      container.innerHTML = html;
+    })
+    .catch(() => { document.getElementById('hiragana-table').textContent = 'Failed to load.'; });
+}
+
+function loadKatakanaTable() {
+  fetch('/api/katakana')
+    .then(res => res.json())
+    .then(table => {
+      const container = document.getElementById('katakana-table');
+      let html = '<div class="grid">';
+      table.forEach(item => {
+        html += `<div class="cell"><div class="kana">${item.kana}</div><div class="romaji">${item.romaji}</div></div>`;
+      });
+      html += '</div>';
+      container.innerHTML = html;
+    })
+    .catch(() => { document.getElementById('katakana-table').textContent = 'Failed to load.'; });
+}
+
+// Flashcards
+let flashcards = [];
+let flashIndex = 0;
+
+function initFlashcards() {
+  const type = document.querySelector('input[name="flashcard-type"]:checked').value;
+  fetch(`/api/${type}`)
+    .then(res => res.json())
+    .then(chars => {
+      flashcards = chars;
+      flashIndex = 0;
+      showFlashcard();
+    });
+
+  document.getElementById('show-romaji').onclick = () => {
+    document.getElementById('flashcard-romaji').style.display = '';
+    document.getElementById('hide-romaji').style.display = '';
+    document.getElementById('show-romaji').style.display = 'none';
+  };
+  document.getElementById('hide-romaji').onclick = () => {
+    document.getElementById('flashcard-romaji').style.display = 'none';
+    document.getElementById('hide-romaji').style.display = 'none';
+    document.getElementById('show-romaji').style.display = '';
+  };
+  document.getElementById('next-flashcard').onclick = () => {
+    if (!flashcards.length) return;
+    flashIndex = (flashIndex + 1) % flashcards.length;
+    showFlashcard();
+  };
+  document.querySelectorAll('input[name="flashcard-type"]').forEach(r => r.addEventListener('change', initFlashcards));
+}
+
+function showFlashcard() {
+  if (!flashcards.length) return;
+  const f = flashcards[flashIndex];
+  document.getElementById('flashcard-kana').textContent = f.kana;
+  document.getElementById('flashcard-romaji').textContent = f.romaji;
+  document.getElementById('flashcard-romaji').style.display = 'none';
+  document.getElementById('show-romaji').style.display = '';
+  document.getElementById('hide-romaji').style.display = 'none';
+}
