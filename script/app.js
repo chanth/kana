@@ -1,58 +1,59 @@
 // public/app.js (static client-only)
+/* Client-only app.js
+   - Quiz (simple kana -> romaji)
+   - Navigation + table rendering (5-col grid)
+   - Flashcards: multiple-choice 4 options with 2s timer
+   - Memory game (5x5)
+*/
+
 let currentKana = null;
 let currentType = 'hiragana';
 
-document.getElementById('start').onclick = () => {
+// Quiz
+const startBtn = document.getElementById('start');
+if (startBtn) startBtn.addEventListener('click', () => {
   currentType = document.querySelector('input[name="type"]:checked').value;
   nextQuiz();
   document.getElementById('quiz').style.display = '';
-  document.getElementById('result').textContent = '';
-};
-
-document.getElementById('submit').onclick = submitAnswer;
-document.getElementById('answer').addEventListener('keydown', e => {
-  if (e.key === 'Enter') submitAnswer();
+  const res = document.getElementById('result'); if (res) res.textContent = '';
 });
+const submitBtn = document.getElementById('submit'); if (submitBtn) submitBtn.addEventListener('click', submitAnswer);
+const answerEl = document.getElementById('answer'); if (answerEl) answerEl.addEventListener('keydown', e => { if (e.key === 'Enter') submitAnswer(); });
 
 function nextQuiz() {
   const list = currentType === 'katakana' ? katakana : hiragana;
   const kana = list[Math.floor(Math.random() * list.length)];
   currentKana = kana;
-  document.getElementById('kana-char').textContent = kana.kana;
-  document.getElementById('answer').value = '';
-  document.getElementById('answer').focus();
+  const char = document.getElementById('kana-char'); if (char) char.textContent = kana.kana;
+  if (answerEl) { answerEl.value = ''; answerEl.focus(); }
 }
 
 function submitAnswer() {
-  const answer = document.getElementById('answer').value.trim().toLowerCase();
-  const correct = currentKana && answer === currentKana.romaji;
-  document.getElementById('result').textContent = correct ? 'Correct!' : `Wrong! (${currentKana ? currentKana.romaji : ''})`;
+  if (!currentKana) return;
+  const answer = (answerEl && answerEl.value) ? answerEl.value.trim().toLowerCase() : '';
+  const correct = answer === currentKana.romaji;
+  const res = document.getElementById('result'); if (res) res.textContent = correct ? 'Correct!' : `Wrong! (${currentKana.romaji})`;
   setTimeout(() => nextQuiz(), 600);
 }
 
-// ----- Navigation and other UI features -----
+// Navigation + sections
 const navButtons = document.querySelectorAll('.nav-btn');
-
 function showSection(id) {
   document.querySelectorAll('section').forEach(s => s.style.display = 'none');
-  const el = document.getElementById(id);
-  if (el) el.style.display = '';
+  const el = document.getElementById(id); if (el) el.style.display = '';
   navButtons.forEach(b => b.classList.toggle('active', b.dataset.section === id));
-
   if (id === 'hiragana-table-section') loadHiraganaTable();
   if (id === 'katakana-table-section') loadKatakanaTable();
   if (id === 'flashcard-section') initFlashcards();
   if (id === 'memory-section') initMemoryGame();
 }
-
 navButtons.forEach(b => b.addEventListener('click', () => showSection(b.dataset.section)));
-
-// Default view
 showSection('quiz-section');
 
 function loadHiraganaTable() {
   const table = hiragana;
   const container = document.getElementById('hiragana-table');
+  if (!container) return;
   let html = '<div class="grid five-cols">';
   table.forEach(item => {
     html += `<div class="cell"><div class="kana">${item.kana}</div><div class="romaji">${item.romaji}</div></div>`;
@@ -64,6 +65,7 @@ function loadHiraganaTable() {
 function loadKatakanaTable() {
   const table = katakana;
   const container = document.getElementById('katakana-table');
+  if (!container) return;
   let html = '<div class="grid five-cols">';
   table.forEach(item => {
     html += `<div class="cell"><div class="kana">${item.kana}</div><div class="romaji">${item.romaji}</div></div>`;
@@ -72,82 +74,126 @@ function loadKatakanaTable() {
   container.innerHTML = html;
 }
 
-// Flashcards
+// Flashcards (multiple-choice)
 let flashcards = [];
 let flashIndex = 0;
+let flashTimer = null;
 
 function initFlashcards() {
-  const type = document.querySelector('input[name="flashcard-type"]:checked').value;
+  const radios = document.querySelectorAll('input[name="flashcard-type"]');
+  const selected = Array.from(radios).find(r => r.checked);
+  const type = selected ? selected.value : 'hiragana';
   flashcards = (type === 'katakana') ? katakana.slice() : hiragana.slice();
   flashIndex = 0;
   showFlashcard();
-
-  document.getElementById('show-romaji').onclick = () => {
-    document.getElementById('flashcard-romaji').style.display = '';
-    document.getElementById('hide-romaji').style.display = '';
-    document.getElementById('show-romaji').style.display = 'none';
-  };
-  document.getElementById('hide-romaji').onclick = () => {
-    document.getElementById('flashcard-romaji').style.display = 'none';
-    document.getElementById('hide-romaji').style.display = 'none';
-    document.getElementById('show-romaji').style.display = '';
-  };
-  document.getElementById('next-flashcard').onclick = () => {
-    if (!flashcards.length) return;
-    flashIndex = (flashIndex + 1) % flashcards.length;
-    showFlashcard();
-  };
   document.querySelectorAll('input[name="flashcard-type"]').forEach(r => r.addEventListener('change', initFlashcards));
 }
 
+function shuffle(array) { for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1));[array[i], array[j]] = [array[j], array[i]]; } }
+
 function showFlashcard() {
-  if (!flashcards.length) return;
-  const f = flashcards[flashIndex];
-  document.getElementById('flashcard-kana').textContent = f.kana;
-  document.getElementById('flashcard-romaji').textContent = f.romaji;
-  document.getElementById('flashcard-romaji').style.display = 'none';
-  document.getElementById('show-romaji').style.display = '';
-  document.getElementById('hide-romaji').style.display = 'none';
+  clearTimeout(flashTimer);
+  const container = document.getElementById('choices');
+  const kanaEl = document.getElementById('flashcard-kana');
+  const resultEl = document.getElementById('flashcard-result');
+  if (!container || !kanaEl) return;
+  if (!flashcards.length) { container.innerHTML = ''; if (resultEl) resultEl.textContent = ''; return; }
+  const item = flashcards[flashIndex];
+  kanaEl.textContent = item.kana;
+  if (resultEl) resultEl.textContent = '';
+
+  // build 4 choices (1 correct + 3 random)
+  const pool = (flashcards.length >= 4) ? flashcards.slice() : hiragana.concat(katakana);
+  shuffle(pool);
+  const choices = [item];
+  for (let i = 0; i < pool.length && choices.length < 4; i++) {
+    if (pool[i].romaji !== item.romaji) choices.push(pool[i]);
+  }
+  shuffle(choices);
+
+  container.innerHTML = '';
+  choices.forEach(c => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.textContent = c.romaji;
+    btn.dataset.romaji = c.romaji;
+    btn.addEventListener('click', () => handleChoice(btn, item));
+    container.appendChild(btn);
+  });
+
+  // 2s timer to auto-reveal
+  flashTimer = setTimeout(() => {
+    revealCorrect(item);
+  }, 3500);
 }
 
-// Memory Game
-let memoryCards = [];
+function handleChoice(btn, correctItem) {
+  clearTimeout(flashTimer);
+  const selected = btn.dataset.romaji;
+  const resultEl = document.getElementById('flashcard-result');
+  if (selected === correctItem.romaji) {
+    btn.classList.add('correct');
+    if (resultEl) resultEl.textContent = 'Correct!';
+    // advance to next after short pause
+    setTimeout(() => {
+      flashIndex = (flashIndex + 1) % flashcards.length;
+      showFlashcard();
+    }, 1000);
+  } else {
+    btn.classList.add('wrong');
+    revealCorrect(correctItem);
+    if (resultEl) resultEl.textContent = `Wrong — correct: ${correctItem.romaji}`;
+    // advance to next after short pause
+    setTimeout(() => {
+      flashIndex = (flashIndex + 1) % flashcards.length;
+      showFlashcard();
+    }, 2500);
+  }
 
+}
+
+function revealCorrect(item) {
+  const container = document.getElementById('choices');
+  if (!container) return;
+  Array.from(container.children).forEach(btn => {
+    if (btn.dataset.romaji === item.romaji) btn.classList.add('correct');
+    else btn.classList.add('disabled');
+  });
+  const resultEl = document.getElementById('flashcard-result');
+  if (resultEl && !resultEl.textContent) resultEl.textContent = `Answer: ${item.romaji}`;
+  // auto-advance
+  setTimeout(() => {
+    flashIndex = (flashIndex + 1) % flashcards.length;
+    showFlashcard();
+  }, 2000);  // show correct answer for 2s before next
+}
+
+// Memory Game (5x5 random)
+let memoryCards = [];
 function initMemoryGame() {
-  document.getElementById('start-memory').onclick = startMemoryGame;
-  document.getElementById('reset-memory').onclick = resetMemoryGame;
+  const start = document.getElementById('start-memory'); if (start) start.onclick = startMemoryGame;
+  const reset = document.getElementById('reset-memory'); if (reset) reset.onclick = resetMemoryGame;
 }
 
 function startMemoryGame() {
-  const type = document.querySelector('input[name="memory-type"]:checked').value;
+  const type = document.querySelector('input[name="memory-type"]:checked')?.value || 'hiragana';
   const chars = (type === 'katakana') ? katakana.slice() : hiragana.slice();
-  // shuffle
-  for (let i = chars.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [chars[i], chars[j]] = [chars[j], chars[i]];
-  }
+  shuffle(chars);
   memoryCards = chars.slice(0, 25);
   renderMemoryGrid();
 }
 
-function resetMemoryGame() {
-  memoryCards = [];
-  document.getElementById('memory-grid').innerHTML = '';
-}
+function resetMemoryGame() { memoryCards = []; const g = document.getElementById('memory-grid'); if (g) g.innerHTML = ''; }
 
 function renderMemoryGrid() {
-  const container = document.getElementById('memory-grid');
+  const container = document.getElementById('memory-grid'); if (!container) return;
   container.innerHTML = '';
-  const grid = document.createElement('div');
-  grid.className = 'memory-grid';
-  memoryCards.forEach((c, idx) => {
-    const card = document.createElement('div');
-    card.className = 'memory-card';
+  const grid = document.createElement('div'); grid.className = 'memory-grid';
+  memoryCards.forEach(c => {
+    const card = document.createElement('div'); card.className = 'memory-card';
     card.dataset.romaji = c.romaji;
     card.innerHTML = `<div class="kana">${c.kana}</div><div class="romaji">${c.romaji}</div>`;
-    card.addEventListener('click', () => {
-      card.classList.toggle('revealed');
-    });
+    card.addEventListener('click', () => card.classList.toggle('revealed'));
     grid.appendChild(card);
   });
   container.appendChild(grid);

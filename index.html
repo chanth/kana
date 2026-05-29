@@ -59,17 +59,15 @@
     <h2>Flash Cards</h2>
     <div id="flashcard-container">
       <div id="flashcard-kana" style="font-size:3em;"></div>
-      <div id="flashcard-romaji" style="font-size:2em; display:none;"></div>
-      <button id="show-romaji">Show Romaji</button>
-      <button id="hide-romaji" style="display:none;">Hide Romaji</button>
-      <button id="next-flashcard">Next</button>
+      <div id="flashcard-result" style="font-size:1.25em; margin-top:0.5em; min-height:1.25em;"></div>
+      <div id="choices" class="choices" style="margin-top:0.75em; display:flex; gap:0.5rem; flex-wrap:wrap; justify-content:center;"></div>
       <div style="margin-top:1em;">
         <label><input type="radio" name="flashcard-type" value="hiragana" checked> Hiragana</label>
         <label><input type="radio" name="flashcard-type" value="katakana"> Katakana</label>
       </div>
     </div>
   </section>
-  <script src="script/app.js"></script>
   <script src="script/data.js"></script>
+  <script src="script/app.js"></script>
 </body>
 </html>

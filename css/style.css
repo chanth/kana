@@ -23,6 +23,11 @@ nav { margin-bottom: 1.5em; display: flex; gap: 0.5em; flex-wrap: wrap; }
 #flashcard-romaji { margin-bottom: 0; color: #555; font-size: 1.25rem; }
 #show-romaji, #hide-romaji, #next-flashcard { margin: 0.25em; padding: 0.45em 0.8em; border-radius: 6px; border: 1px solid #ddd; background: #fff; cursor: pointer; }
 
+.choices { display:flex; gap:0.5rem; flex-wrap:wrap; justify-content:center; }
+.choice-btn { padding:0.5em 0.9em; border-radius:8px; border:1px solid #ddd; background:#fff; cursor:pointer; font-size:1rem; }
+.choice-btn.correct { background:#dff6e6; border-color:#7bd18a; }
+.choice-btn.wrong { background:#ffecec; border-color:#f08a8a; }
+
 /* Page layout */
 body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; margin: 2em; background: #f9f9f9; color: #222; }
 h1 { color: #333; margin-bottom: 0.5em; }
