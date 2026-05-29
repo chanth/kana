@@ -1,32 +1,47 @@
-# Learn Hiragana and Katakana App
+# Learn Hiragana & Katakana
 
-A simple Node.js app to assist learning Hiragana and Katakana. Uses SQLite to store user progress.
+Lightweight client-side app to practice Hiragana and Katakana. The repository now uses a simplified structure: a single folder contains the complete static site (HTML, CSS, JS, and kana data).
 
 ## Features
-- Practice Hiragana and Katakana quizzes
-- Track user progress in SQLite
-- Simple web UI
+- Quiz (type romaji for shown kana)
+- Kana tables (Hiragana & Katakana)
+- Flash cards
+- Memory game (5×5 grid)
 
-## Getting Started
+## Quick start (static preview)
 
-1. Install dependencies:
-   ```bash
-   npm install
-   ```
-2. Start the app:
-   ```bash
-   npm start
-   ```
-3. Open your browser at http://localhost:3000
+Serve the repository root (contains the site files) locally — no Node server required:
 
-## Project Structure
-- `server.js` — Express backend
-- `db.js` — SQLite database logic
-- `public/` — Frontend (HTML/CSS/JS)
+```bash
+npx http-server . -p 3030
+# or
+npx serve . -p 3030
+```
 
-## Requirements
-- Node.js
-- npm
+Open http://localhost:3030 in your browser.
+
+## Optional: run with Node (if `server.js` exists)
+
+If you prefer to run the optional Express server (some forks may include it), you can start it with:
+
+```bash
+node server.js
+```
+
+The static site works independently of any server and is the recommended deployment for GitHub Pages or Cloudflare Pages.
+
+## Project layout
+
+- `/` — Static site assets
+  - `index.html` — Single-page UI
+  - `style.css` — Styles
+  - `data.js` — Kana arrays used by the client
+  - `app.js` — Client logic (quiz, tables, flashcards, memory game)
+
+## Deploy
+
+- GitHub Pages: set Pages source to the `main` branch and the repository root (`/`), or use the `gh-pages` branch. Alternatively copy files to a `/docs` folder and select that as the Pages source.
+- Cloudflare Pages: configure the project to publish the repository root (`/`) (no build step), or point the publish directory to a specific folder if desired.
 
 ## License
 MIT
