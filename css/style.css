@@ -28,6 +28,44 @@ nav { margin-bottom: 1.5em; display: flex; gap: 0.5em; flex-wrap: wrap; }
 .choice-btn.correct { background:#dff6e6; border-color:#7bd18a; }
 .choice-btn.wrong { background:#ffecec; border-color:#f08a8a; }
 
+/* Matching Game */
+.matching-game { display: grid; grid-template-columns: repeat(2, minmax(220px, 1fr)); gap: 1.5rem; justify-content: center; margin-top: 1.5rem; }
+.matching-column { display: flex; flex-direction: column; gap: 0.75rem; }
+.matching-column h3 { margin: 0; font-size: 1.1rem; color: #333; }
+.matching-instructions { margin: 0.5rem 0 0; color: #4a5568; font-size: 0.95rem; }
+.matching-column-body { display: grid; gap: 0.75rem; }
+.matching-tile {
+  background: #fff;
+  border: 1px solid #e6e6e6;
+  border-radius: 10px;
+  min-height: 90px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 2rem;
+  padding: 0.75rem;
+  cursor: pointer;
+  user-select: none;
+  transition: transform .12s, border-color .12s, box-shadow .12s, background .12s;
+}
+.matching-tile:hover { transform: translateY(-3px); border-color: #2b6cb0; box-shadow: 0 8px 20px rgba(43,108,176,.1); }
+.matching-tile.selected { background: #ebf8ff; border-color: #4299e1; box-shadow: 0 0 0 3px rgba(66,153,225,.12); }
+.matching-tile.matched { background: #e6fffa; border-color: #38b2ac; color: #2c7a7b; opacity: 0.9; cursor: default; }
+.matching-tile.error { background: #fff5f5; border-color: #f56565; }
+#reset-matching { margin-top: 1rem; padding: 0.65rem 1rem; border-radius: 8px; border: 1px solid #cbd5e0; background: #fff; cursor: pointer; transition: background .15s, transform .12s; }
+#reset-matching:hover { background: #edf2f7; transform: translateY(-1px); }
+
+@media (max-width: 720px) {
+  .matching-game { grid-template-columns: 1fr; }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-6px); }
+  75% { transform: translateX(6px); }
+}
+
 /* Page layout */
 body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; margin: 2em; background: #f9f9f9; color: #222; }
 h1 { color: #333; margin-bottom: 0.5em; }

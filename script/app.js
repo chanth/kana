@@ -4,6 +4,7 @@
    - Navigation + table rendering (5-col grid)
    - Flashcards: multiple-choice 4 options with 2s timer
    - Memory game (5x5)
+   - Matching game (Hiragana vs Katakana)
 */
 
 let currentKana = null;
@@ -46,6 +47,7 @@ function showSection(id) {
   if (id === 'katakana-table-section') loadKatakanaTable();
   if (id === 'flashcard-section') initFlashcards();
   if (id === 'memory-section') initMemoryGame();
+  if (id === 'matching-section') initMatchingGame();
 }
 navButtons.forEach(b => b.addEventListener('click', () => showSection(b.dataset.section)));
 showSection('quiz-section');
@@ -197,4 +199,104 @@ function renderMemoryGrid() {
     grid.appendChild(card);
   });
   container.appendChild(grid);
+}
+
+// Matching Game
+let selectedHiragana = null;
+let selectedKatakana = null;
+
+function initMatchingGame() {
+  const hCol = document.getElementById('hiragana-column');
+  const kCol = document.getElementById('katakana-column');
+  const resetBtn = document.getElementById('reset-matching');
+  if (!hCol || !kCol) return;
+
+  const tempH = [...hiragana];
+  const selectedPairs = [];
+  shuffle(tempH);
+
+  for (let i = 0; i < 5; i++) {
+    const h = tempH[i];
+    const k = katakana.find(item => item.romaji === h.romaji);
+    selectedPairs.push({ h, k });
+  }
+
+  const hTiles = selectedPairs.map(p => p.h.kana);
+  const kTiles = selectedPairs.map(p => p.k.kana);
+  shuffle(hTiles);
+  shuffle(kTiles);
+
+  renderMatchingTiles(hCol, kCol, hTiles, kTiles, selectedPairs);
+
+  if (resetBtn) resetBtn.onclick = initMatchingGame;
+}
+
+function renderMatchingTiles(hCol, kCol, hTiles, kTiles, pairs) {
+  hCol.innerHTML = '';
+  kCol.innerHTML = '';
+  selectedHiragana = null;
+  selectedKatakana = null;
+
+  hTiles.forEach(kana => {
+    const div = document.createElement('div');
+    div.className = 'matching-tile';
+    div.textContent = kana;
+    div.dataset.kana = kana;
+    div.addEventListener('click', () => handleTileClick(div, 'h', pairs));
+    hCol.appendChild(div);
+  });
+
+  kTiles.forEach(kana => {
+    const div = document.createElement('div');
+    div.className = 'matching-tile';
+    div.textContent = kana;
+    div.dataset.kana = kana;
+    div.addEventListener('click', () => handleTileClick(div, 'k', pairs));
+    kCol.appendChild(div);
+  });
+}
+
+function handleTileClick(el, type, pairs) {
+  if (el.classList.contains('matched') || el.classList.contains('error')) return;
+
+  if (type === 'h') {
+    if (selectedHiragana) selectedHiragana.el.classList.remove('selected');
+    selectedHiragana = { el, kana: el.dataset.kana };
+  } else {
+    if (selectedKatakana) selectedKatakana.el.classList.remove('selected');
+    selectedKatakana = { el, kana: el.dataset.kana };
+  }
+  el.classList.add('selected');
+
+  if (selectedHiragana && selectedKatakana) {
+    const isMatch = pairs.some(p =>
+      p.h.kana === selectedHiragana.kana && p.k.kana === selectedKatakana.kana
+    );
+
+    if (isMatch) {
+      selectedHiragana.el.classList.add('matched');
+      selectedKatakana.el.classList.add('matched');
+      selectedHiragana.el.classList.remove('selected');
+      selectedKatakana.el.classList.remove('selected');
+      selectedHiragana = null;
+      selectedKatakana = null;
+      
+      // Check if all matched
+      const allMatched = document.querySelectorAll('.matching-tile.matched').length === 10;
+      if (allMatched) {
+        setTimeout(() => alert('Great job! You matched them all!'), 300);
+      }
+    } else {
+      const hEl = selectedHiragana.el;
+      const kEl = selectedKatakana.el;
+      hEl.classList.add('error');
+      kEl.classList.add('error');
+      setTimeout(() => {
+        hEl.classList.remove('error', 'selected');
+        kEl.classList.remove('error', 'selected');
+      }, 500);
+      selectedHiragana = null;
+      selectedKatakana = null;
+    }
+  }
 }

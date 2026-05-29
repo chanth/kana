@@ -14,6 +14,7 @@
     <button class="nav-btn" data-section="katakana-table-section">Katakana Table</button>
     <button class="nav-btn" data-section="flashcard-section">Flash Cards</button>
     <button class="nav-btn" data-section="memory-section">Memory Game</button>
+    <button class="nav-btn" data-section="matching-section">Matching Game</button>
   </nav>
 
   <section id="quiz-section">
@@ -56,7 +57,7 @@
   </section>
 
   <section id="flashcard-section" style="display:none;">
-    <h2>Flash Cards</h2>
+    <h2 class="section-title">Flash Cards</h2>
     <div id="flashcard-container">
       <div id="flashcard-kana" style="font-size:3em;"></div>
       <div id="flashcard-result" style="font-size:1.25em; margin-top:0.5em; min-height:1.25em;"></div>
@@ -67,6 +68,24 @@
       </div>
     </div>
   </section>
+
+  <section id="matching-section" style="display:none;">
+    <h2 class="section-title">Matching Game</h2>
+    <p>Match the Hiragana with its Katakana equivalent!</p>
+    <p class="matching-instructions">Click a Hiragana tile, then click the matching Katakana tile.</p>
+    <div id="matching-game-container" class="matching-game">
+      <div class="matching-column">
+        <h3>Hiragana</h3>
+        <div id="hiragana-column" class="matching-column-body"></div>
+      </div>
+      <div class="matching-column">
+        <h3>Katakana</h3>
+        <div id="katakana-column" class="matching-column-body"></div>
+      </div>
+    </div>
+    <button id="reset-matching" style="margin-top: 1em;">New Game</button>
+  </section>
+
   <script src="script/data.js"></script>
   <script src="script/app.js"></script>
 </body>
