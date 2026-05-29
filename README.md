@@ -1,6 +1,6 @@
 # Learn Hiragana & Katakana
 
-Lightweight client-side app to practice Hiragana and Katakana. The repository now uses a simplified structure: a single folder contains the complete static site (HTML, CSS, JS, and kana data).
+Lightweight client-side app to practice Hiragana and Katakana. The repository uses a simplified structure: site files are at the repository root with static assets organized under `css/` and `script/` subfolders.
 
 ## Features
 - Quiz (type romaji for shown kana)
@@ -34,9 +34,9 @@ The static site works independently of any server and is the recommended deploym
 
 - `/` — Static site assets
   - `index.html` — Single-page UI
-  - `style.css` — Styles
-  - `data.js` — Kana arrays used by the client
-  - `app.js` — Client logic (quiz, tables, flashcards, memory game)
+  - `css/style.css` — Styles
+  - `script/data.js` — Kana arrays used by the client
+  - `script/app.js` — Client logic (quiz, tables, flashcards, memory game)
 
 ## Deploy
 

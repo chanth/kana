@@ -53,7 +53,7 @@ showSection('quiz-section');
 function loadHiraganaTable() {
   const table = hiragana;
   const container = document.getElementById('hiragana-table');
-  let html = '<div class="grid">';
+  let html = '<div class="grid five-cols">';
   table.forEach(item => {
     html += `<div class="cell"><div class="kana">${item.kana}</div><div class="romaji">${item.romaji}</div></div>`;
   });
@@ -64,7 +64,7 @@ function loadHiraganaTable() {
 function loadKatakanaTable() {
   const table = katakana;
   const container = document.getElementById('katakana-table');
-  let html = '<div class="grid">';
+  let html = '<div class="grid five-cols">';
   table.forEach(item => {
     html += `<div class="cell"><div class="kana">${item.kana}</div><div class="romaji">${item.romaji}</div></div>`;
   });
